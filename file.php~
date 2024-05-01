@@ -1,0 +1,33 @@
+<?php
+require_once( dirname(__FILE__) . '/../inc/config.php' );
+require_once( dirname(__FILE__) . '/../inc/contentsConfig.php' );
+require_once( dirname(__FILE__) . '/../inc/lib/DB/.contentsDB.class.php' );
+
+$query = new contentsDB();
+
+
+$file = file_get_contents( dirname(__FILE__) . '/../upImage/product/' . $_GET['fileName'] );
+
+$finfo = new finfo( FILEINFO_MIME_TYPE );
+$finfofile = $finfo->file( dirname(__FILE__) . '/../upImage/product/' . $_GET['fileName'] );
+
+
+if( $_SESSION['member']['flg'] )
+{
+    $query->SetDownloadMember( $_SESSION['member']['memberId'], $_GET );
+
+    header( "Cache-Control: public" );
+    header( "Pragma: public" );
+    header( "Content-Type: " . $finfofile );
+    header( "Content-Disposition: attachment; filename=" . $_GET['fileName'] );
+    header( "Content-Length:" . strlen( $file ) );
+    @readfile( $_GET['fileName'] );
+
+    echo $file;
+}
+else
+{
+    header( 'Location: ./detail.php?id=' . $_GET['id'] );
+    die;
+}
+?>
